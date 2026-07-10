@@ -101,7 +101,8 @@ int nurl_cli_parse(int argc, char **argv, CommonArgs *args, char **url) {
                 for (size_t i = 0; i < key_len; i++) {
                     if (isspace((unsigned char)optarg[i]) || iscntrl((unsigned char)optarg[i])) { nurl_diag_err("header key contains invalid characters."); return -1; }
                 }
-                if (append_arg_str(&args->header, &args->header_count, optarg, "header")) return -1; break;
+                if (append_arg_str(&args->header, &args->header_count, optarg, "header")) return -1; 
+                break;
             }
             case 'o': if (set_arg_str(&args->output, optarg, "output")) return -1; break;
             case 'i': args->include = true; break;
