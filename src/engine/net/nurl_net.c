@@ -244,7 +244,7 @@ int nurl_net_connect_proxy_ex(
     }
 
     // HTTP CONNECT Tunneling
-    NurlBuf connect_req;
+    NutBuf connect_req;
     nurl_buf_init(&connect_req);
     nurl_buf_printf(&connect_req, "CONNECT %s:%d HTTP/1.1\r\nHost: %s:%d\r\n", target_host, target_port, target_host, target_port);
     if (allocated_target_host) free(allocated_target_host);

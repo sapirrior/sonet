@@ -1,8 +1,8 @@
 #include "nurl_ctx.h"
 #include <stdlib.h>
 
-NurlCtx *nurl_ctx_create(void) {
-    NurlCtx *ctx = calloc(1, sizeof(NurlCtx));
+NutCtx *nurl_ctx_create(void) {
+    NutCtx *ctx = calloc(1, sizeof(NutCtx));
     if (!ctx) return NULL;
     
     ctx->pool = nurl_pool_create();
@@ -14,7 +14,7 @@ NurlCtx *nurl_ctx_create(void) {
     return ctx;
 }
 
-void nurl_ctx_destroy(NurlCtx *ctx) {
+void nurl_ctx_destroy(NutCtx *ctx) {
     if (!ctx) return;
     if (ctx->pool) {
         nurl_pool_destroy(ctx->pool);

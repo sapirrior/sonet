@@ -13,8 +13,8 @@
 #include <errno.h>
 
 nurl_err_t nurl_http_request(
-    NurlStream *stream,
-    NurlHttpParams *p,
+    NutStream *stream,
+    NutHttpParams *p,
     nurl_http_response_t **out_response
 ) {
     if (out_response) *out_response = NULL;
@@ -35,7 +35,7 @@ nurl_err_t nurl_http_request(
     }
 
     // 1. Construct HTTP request headers
-    NurlBuf req_buf;
+    NutBuf req_buf;
     nurl_buf_init(&req_buf);
 
     bool has_user_agent = false;
@@ -115,7 +115,7 @@ nurl_err_t nurl_http_request(
     // Send HTTP Body Parts if present
     if (p->body_parts && p->body_parts_count > 0) {
         for (size_t i = 0; i < p->body_parts_count; i++) {
-            NurlBodyPart *part = &p->body_parts[i];
+            NutBodyPart *part = &p->body_parts[i];
             if (part->type == NURL_BODY_PART_MEM) {
                 if (part->data && part->len > 0) {
                     int wn = nurl_stream_write(stream, part->data, part->len);

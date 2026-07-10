@@ -4,17 +4,17 @@
 #include <string.h>
 #include <stdio.h>
 
-NurlConnPool *nurl_pool_create(void) {
-    NurlConnPool *pool = calloc(1, sizeof(NurlConnPool));
+NutConnPool *nurl_pool_create(void) {
+    NutConnPool *pool = calloc(1, sizeof(NutConnPool));
     if (!pool) return NULL;
     return pool;
 }
 
-void nurl_pool_destroy(NurlConnPool *pool) {
+void nurl_pool_destroy(NutConnPool *pool) {
     if (!pool) return;
     for (int i = 0; i < NURL_POOL_MAX; i++) {
         if (pool->entries[i].stream) {
-            NurlStream *s = pool->entries[i].stream;
+            NutStream *s = pool->entries[i].stream;
             if (s->tls) nurl_tls_free(s->tls);
             nurl_net_close(s->fd);
             nurl_stream_free(s);
@@ -23,13 +23,13 @@ void nurl_pool_destroy(NurlConnPool *pool) {
     free(pool);
 }
 
-nurl_err_t nurl_pool_acquire(NurlConnPool *pool, const char *host, int port, bool is_tls, const NurlRequest *req, NurlStream **stream) {
+nurl_err_t nurl_pool_acquire(NutConnPool *pool, const char *host, int port, bool is_tls, const NutRequest *req, NutStream **stream) {
     if (!pool) return NURL_ERR_GENERIC;
     time_t now = time(NULL);
 
     // 1. Scan for existing warm connection
     for (int i = 0; i < NURL_POOL_MAX; i++) {
-        NurlPoolEntry *e = &pool->entries[i];
+        NutPoolEntry *e = &pool->entries[i];
         if (e->stream && !e->in_use && e->port == port && e->is_tls == is_tls && strcmp(e->host, host) == 0) {
             // Idle eviction check (e.g. 60 seconds)
             if (now - e->last_used > 60) {
@@ -65,7 +65,7 @@ nurl_err_t nurl_pool_acquire(NurlConnPool *pool, const char *host, int port, boo
     int oldest_slot = -1;
 
     for (int i = 0; i < NURL_POOL_MAX; i++) {
-        NurlPoolEntry *e = &pool->entries[i];
+        NutPoolEntry *e = &pool->entries[i];
         if (!e->stream) {
             slot = i;
             break;
@@ -78,7 +78,7 @@ nurl_err_t nurl_pool_acquire(NurlConnPool *pool, const char *host, int port, boo
 
     if (slot < 0) {
         if (oldest_slot >= 0) {
-            NurlPoolEntry *e = &pool->entries[oldest_slot];
+            NutPoolEntry *e = &pool->entries[oldest_slot];
             if (req->verbose && !req->silent) {
                 fprintf(stderr, "* Connection pool: pool full, evicting oldest connection to %s:%d\n", e->host, e->port);
             }
@@ -120,7 +120,7 @@ nurl_err_t nurl_pool_acquire(NurlConnPool *pool, const char *host, int port, boo
         }
     }
 
-    NurlStream *s = nurl_stream_new(fd, t);
+    NutStream *s = nurl_stream_new(fd, t);
     if (!s) {
         if (t) nurl_tls_free(t);
         nurl_net_close(fd);
@@ -131,7 +131,7 @@ nurl_err_t nurl_pool_acquire(NurlConnPool *pool, const char *host, int port, boo
 
     // Save to slot if available
     if (slot >= 0) {
-        NurlPoolEntry *e = &pool->entries[slot];
+        NutPoolEntry *e = &pool->entries[slot];
         strncpy(e->host, host, sizeof(e->host) - 1);
         e->host[sizeof(e->host) - 1] = '\0';
         e->port = port;
@@ -144,12 +144,12 @@ nurl_err_t nurl_pool_acquire(NurlConnPool *pool, const char *host, int port, boo
     return NURL_OK;
 }
 
-void nurl_pool_release(NurlConnPool *pool, const char *host, int port, NurlStream *stream) {
+void nurl_pool_release(NutConnPool *pool, const char *host, int port, NutStream *stream) {
     if (!pool) return;
     (void)host;
     (void)port;
     for (int i = 0; i < NURL_POOL_MAX; i++) {
-        NurlPoolEntry *e = &pool->entries[i];
+        NutPoolEntry *e = &pool->entries[i];
         if (e->stream == stream) {
             e->in_use = false;
             e->last_used = time(NULL);
@@ -162,10 +162,10 @@ void nurl_pool_release(NurlConnPool *pool, const char *host, int port, NurlStrea
     nurl_stream_free(stream);
 }
 
-void nurl_pool_evict(NurlConnPool *pool, NurlStream *stream) {
+void nurl_pool_evict(NutConnPool *pool, NutStream *stream) {
     if (!pool || !stream) return;
     for (int i = 0; i < NURL_POOL_MAX; i++) {
-        NurlPoolEntry *e = &pool->entries[i];
+        NutPoolEntry *e = &pool->entries[i];
         if (e->stream == stream) {
             if (e->stream->tls) nurl_tls_free(e->stream->tls);
             nurl_net_close(e->stream->fd);

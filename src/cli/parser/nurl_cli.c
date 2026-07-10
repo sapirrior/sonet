@@ -155,26 +155,31 @@ int nurl_cli_parse(int argc, char **argv, CommonArgs *args, char **url) {
             case 'I': if (args->method) free(args->method); args->method = strdup("HEAD"); args->include = true; break;
             case 'V': printf("nurl %s\n", NURL_VERSION); exit(0);
             case 'h': return -1; // -1 indicates explicit help request
-            default:  nurl_diag_err("option unrecognized or invalid.");
+            default:  if (optind > 0 && optind <= argc) {
+                          nurl_diag_err("option '%s' unrecognized or invalid.", argv[optind - 1]);
+                      } else {
+                          nurl_diag_err("option unrecognized or invalid.");
+                      }
                       nurl_diag_hint("run 'nurl --help' for usage."); return NURL_ERR_ARG;
         }
     }
-
+ 
     if (args->tls12 && args->tls13) { nurl_diag_err("conflicting TLS versions"); return NURL_ERR_ARG; }
     if (args->ping && args->dry_run) { nurl_diag_err("--ping and --dry-run are mutually exclusive"); return NURL_ERR_ARG; }
     if (args->ping && args->download) { nurl_diag_err("--ping and --download are mutually exclusive"); return NURL_ERR_ARG; }
     if (args->resolve && args->download) { nurl_diag_err("--resolve and --download are mutually exclusive"); return NURL_ERR_ARG; }
     if (args->no_verify && args->cacert) { nurl_diag_warn("--insecure and --cacert used together; --cacert takes precedence."); }
     if (args->resume && !args->download && !args->output) { nurl_diag_err("--resume requires --download or -o"); return NURL_ERR_ARG; }
-
+ 
     int rem = argc - optind;
     if (rem <= 0) { nurl_diag_err("no URL specified!"); return NURL_ERR_ARG; }
-
+    if (rem > 1) { nurl_diag_err("only a single URL target is supported. Multiple targets specified."); return NURL_ERR_ARG; }
+ 
     *url = nurl_normalize_url(argv[optind]);
     nurl_cli_infer_method(args);
 
     if (args->data && (nurl_strcasecmp(args->method, "GET") == 0 || nurl_strcasecmp(args->method, "HEAD") == 0)) {
-        fprintf(stderr, "nurl: Warning: sending body with %s is non-standard.\n", args->method);
+        nurl_diag_warn("sending body with %s is non-standard.", args->method);
     }
     if (nurl_strcasecmp(args->method, "HEAD") == 0) args->include = true;
 

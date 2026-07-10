@@ -133,7 +133,7 @@ static int nurl_mode_ping(const char *url, const CommonArgs *common) {
         if (!t) { nurl_net_close(fd); free(scheme); free(host); free(path); return NURL_ERR_TLS; }
         if (nurl_tls_handshake(t, fd, host) != 0) { nurl_tls_free(t); nurl_net_close(fd); free(scheme); free(host); free(path); return NURL_ERR_TLS_HANDSHAKE; }
     }
-    NurlStream *stream = nurl_stream_new(fd, t);
+    NutStream *stream = nurl_stream_new(fd, t);
 
     if (common->verbose && !common->silent) {
         if (use_tls) fprintf(stderr, "* Connected to %s:%d (TLS warm)\n", host, port);
@@ -144,11 +144,11 @@ static int nurl_mode_ping(const char *url, const CommonArgs *common) {
     for (unsigned int i = 0; i < count; i++) {
         double start = nurl_utils_get_time_sec();
         nurl_http_response_t *res = NULL;
-        NurlHttpParams p = { .method = "HEAD", .path = path, .hostname = host, .extra_headers = "Connection: keep-alive\r\n" };
+        NutHttpParams p = { .method = "HEAD", .path = path, .hostname = host, .extra_headers = "Connection: keep-alive\r\n" };
         err = nurl_http_request(stream, &p, &res);
 
         if (err != NURL_OK) {
-            fprintf(stderr, "ping: request %u failed (error %d)\n", i + 1, err);
+            nurl_diag_err("ping: request %u failed (error %d)", i + 1, err);
             latencies[i] = 0;
         } else {
             unsigned long diff = (unsigned long)((nurl_utils_get_time_sec() - start) * 1000.0);
@@ -211,7 +211,7 @@ typedef struct {
     bool silent;
 } DownloadCtx;
 
-static void nurl_download_header_cb(NurlRequest *req, const nurl_http_response_t *res, void *user_data) {
+static void nurl_download_header_cb(NutRequest *req, const nurl_http_response_t *res, void *user_data) {
     DownloadCtx *dctx = (DownloadCtx *)user_data;
     if (res->status_code >= 300 && res->status_code < 400) return; // Ignore redirects
     if (req->out) return; // Already open
@@ -233,7 +233,7 @@ static void nurl_download_header_cb(NurlRequest *req, const nurl_http_response_t
     }
 }
 
-static int nurl_mode_download(NurlCtx *ctx, const char *url, const CommonArgs *common) {
+static int nurl_mode_download(NutCtx *ctx, const char *url, const CommonArgs *common) {
     char *scheme = NULL, *host = NULL, *path = NULL, *filename = NULL;
     int port = 0;
     if (nurl_utils_parse_url(url, &scheme, &host, &port, &path) != 0) return NURL_ERR_URL;
@@ -254,9 +254,9 @@ static int nurl_mode_download(NurlCtx *ctx, const char *url, const CommonArgs *c
         if (nurl_stat(filename, &st) == 0 && NURL_S_ISREG(st.st_mode)) start_pos = (unsigned long)st.st_size;
     }
 
-    NurlRequest *req = nurl_request_new();
+    NutRequest *req = nurl_request_new();
     nurl_request_from_args(req, "GET", url, common);
-    NurlProgressCtx p_ctx = { .resume_offset = start_pos, .silent = common->silent, .start_time = nurl_utils_get_time_sec(), .last_update = 0 };
+    NutProgressCtx p_ctx = { .resume_offset = start_pos, .silent = common->silent, .start_time = nurl_utils_get_time_sec(), .last_update = 0 };
     if (common->progress) { req->progress_cb = nurl_progress_update; req->progress_data = &p_ctx; }
 
     DownloadCtx dctx = { .filename_ptr = &filename, .is_stdout = is_stdout, .resume_offset = start_pos, .silent = common->silent };
@@ -272,7 +272,7 @@ static int nurl_mode_download(NurlCtx *ctx, const char *url, const CommonArgs *c
 
     nurl_http_response_t *res = NULL;
     char *effective_url = NULL;
-    NurlOperationStats stats = {0};
+    NutOperationStats stats = {0};
 
     // Note: req->out is opened in the header callback
     int err = execute_with_retry(ctx, req, common, &res, &effective_url, &stats);
@@ -288,13 +288,13 @@ static int nurl_mode_download(NurlCtx *ctx, const char *url, const CommonArgs *c
     return err;
 }
 
-static int nurl_mode_upload(NurlCtx *ctx, const char *url, const CommonArgs *common) {
+static int nurl_mode_upload(NutCtx *ctx, const char *url, const CommonArgs *common) {
     if (!common->upload_file) { nurl_diag_err("no upload file specified."); return NURL_ERR_ARG; }
     struct stat st;
     if (nurl_stat(common->upload_file, &st) != 0 || !NURL_S_ISREG(st.st_mode)) { nurl_diag_err("could not read upload file '%s'.", common->upload_file); return NURL_ERR_IO; }
 
-    nurl_http_response_t *res = NULL; char *eff_url = NULL; NurlOperationStats stats = {0};
-    NurlRequest *req = nurl_request_new();
+    nurl_http_response_t *res = NULL; char *eff_url = NULL; NutOperationStats stats = {0};
+    NutRequest *req = nurl_request_new();
     nurl_request_from_args(req, common->method ? common->method : "POST", url, common);
 
     int err = execute_with_retry(ctx, req, common, &res, &eff_url, &stats);
@@ -311,7 +311,7 @@ static int nurl_mode_upload(NurlCtx *ctx, const char *url, const CommonArgs *com
     return ret;
 }
 
-int nurl_dispatch(NurlCtx *ctx, const char *method, const char *url, const CommonArgs *args) {
+int nurl_dispatch(NutCtx *ctx, const char *method, const char *url, const CommonArgs *args) {
     if (args->dry_run)  return nurl_mode_inspect(url, args);
     if (args->ping)     return nurl_mode_ping(url, args);
     if (args->resolve)  return nurl_mode_resolve(url, args);

@@ -9,6 +9,7 @@
 #include "cli/config/nurl_config.h"
 #include "nurl_net.h"
 #include "nurl_utils.h"
+#include "nurl_diag.h"
 
 #ifdef _WIN32
 #include <io.h>
@@ -19,7 +20,7 @@
 #endif
 
 static void print_help(const char *prog_name) {
-    printf("NetworkURL (nurl) — A clean, fast, and structured HTTP client CLI\n\n");
+    printf("Nurl (nurl) — A clean, fast, and structured HTTP client CLI\n\n");
     printf("Usage:\n");
     printf("  %s <URL> [options]\n\n", prog_name);
     printf("Options:\n");
@@ -81,7 +82,7 @@ int main(int argc, char **argv) {
     signal(SIGPIPE, SIG_IGN);
 #endif
     if (nurl_net_init() != 0) {
-        fprintf(stderr, "Error: Network initialization failed.\n");
+        nurl_diag_err("Network initialization failed.");
         return 1;
     }
 
@@ -122,7 +123,7 @@ int main(int argc, char **argv) {
         }
     }
 
-    NurlCtx *ctx = nurl_ctx_create();
+    NutCtx *ctx = nurl_ctx_create();
     int result = nurl_dispatch(ctx, method, url, &args);
     nurl_ctx_destroy(ctx);
 

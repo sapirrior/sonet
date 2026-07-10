@@ -23,10 +23,10 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-static void handle_write_out(const char *template, const nurl_http_response_t *res, const char *method, const char *url, double elapsed_sec, const NurlOperationStats *stats, NurlRequest *req) {
+static void handle_write_out(const char *template, const nurl_http_response_t *res, const char *method, const char *url, double elapsed_sec, const NutOperationStats *stats, NutRequest *req) {
     if (!template) return;
 
-    NurlBuf b;
+    NutBuf b;
     nurl_buf_init(&b);
 
     const char *p = template;
@@ -128,18 +128,18 @@ void dump_headers_to_file(const char *filename, const nurl_http_response_t *res)
     }
 }
 
-int nurl_request_generic(NurlCtx *ctx, const char *method, const char *url, const CommonArgs *common) {
+int nurl_request_generic(NutCtx *ctx, const char *method, const char *url, const CommonArgs *common) {
     double start_time = nurl_utils_get_time_sec();
 
     nurl_http_response_t *res = NULL;
     char *effective_url = NULL;
-    NurlOperationStats stats = {0};
+    NutOperationStats stats = {0};
 
-    NurlRequest *req = nurl_request_new();
+    NutRequest *req = nurl_request_new();
     if (!req) return NURL_ERR_OOM;
     nurl_request_from_args(req, method, url, common);
 
-    NurlProgressCtx p_ctx;
+    NutProgressCtx p_ctx;
     if (common->progress) {
         p_ctx.resume_offset = 0;
         p_ctx.silent = common->silent;

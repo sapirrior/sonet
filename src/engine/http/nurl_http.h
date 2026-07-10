@@ -20,17 +20,17 @@
  * If successful, *out_response will contain the dynamically allocated response.
  */
 
-typedef struct NurlHttpParams NurlHttpParams;
-typedef void (*nurl_headers_cb)(NurlHttpParams *p, const nurl_http_response_t *res, void *user_data);
+typedef struct NutHttpParams NutHttpParams;
+typedef void (*nurl_headers_cb)(NutHttpParams *p, const nurl_http_response_t *res, void *user_data);
 
-struct NurlHttpParams {
+struct NutHttpParams {
     const char        *method;
     const char        *path;
     const char        *hostname;
     const char        *extra_headers;
     const uint8_t     *body;
     size_t             body_len;
-    NurlBodyPart      *body_parts;
+    NutBodyPart      *body_parts;
     size_t             body_parts_count;
     FILE              *body_out;
     unsigned long      resume_offset;
@@ -42,8 +42,8 @@ struct NurlHttpParams {
 };
 
 nurl_err_t nurl_http_request(
-    NurlStream *stream,
-    NurlHttpParams *p,
+    NutStream *stream,
+    NutHttpParams *p,
     nurl_http_response_t **out_response
 );
 

@@ -8,6 +8,6 @@
 /**
  * Executes a request with automatic retries on transient errors.
  */
-int execute_with_retry(NurlCtx *ctx, NurlRequest *req, const CommonArgs *common, nurl_http_response_t **out_res, char **out_effective_url, NurlOperationStats *stats);
+int execute_with_retry(NutCtx *ctx, NutRequest *req, const CommonArgs *common, nurl_http_response_t **out_res, char **out_effective_url, NutOperationStats *stats);
 
 #endif /* NURL_RETRY_H */

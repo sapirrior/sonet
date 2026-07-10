@@ -19,14 +19,14 @@ typedef struct {
 typedef enum {
     NURL_BODY_PART_MEM,
     NURL_BODY_PART_FILE
-} NurlBodyPartType;
+} NutBodyPartType;
 
 typedef struct {
-    NurlBodyPartType type;
+    NutBodyPartType type;
     const uint8_t *data;
     size_t len;
     const char *filepath;
-} NurlBodyPart;
+} NutBodyPart;
 
 /* Progress callback */
 typedef void (*nurl_progress_cb)(unsigned long downloaded, unsigned long total, bool finished, void *user_data);

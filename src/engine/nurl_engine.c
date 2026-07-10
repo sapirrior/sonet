@@ -30,8 +30,8 @@ static bool cookie_domain_matches(const char *cookie_domain, const char *host) {
     return false;
 }
 
-static void engine_header_callback(NurlHttpParams *p, const nurl_http_response_t *res, void *user_data) {
-    NurlRequest *req = (NurlRequest *)user_data;
+static void engine_header_callback(NutHttpParams *p, const nurl_http_response_t *res, void *user_data) {
+    NutRequest *req = (NutRequest *)user_data;
     if (req->header_cb) {
         req->header_cb(req, res, req->header_data);
         p->body_out = req->out;
@@ -39,11 +39,11 @@ static void engine_header_callback(NurlHttpParams *p, const nurl_http_response_t
 }
 
 int nurl_engine_execute_request(
-    NurlCtx *ctx,
-    NurlRequest *req,
+    NutCtx *ctx,
+    NutRequest *req,
     nurl_http_response_t **out_response,
     char **out_effective_url,
-    NurlOperationStats *out_stats
+    NutOperationStats *out_stats
 ) {
     if (!req || !req->headers) {
         return NURL_ERR_GENERIC;
@@ -113,7 +113,7 @@ int nurl_engine_execute_request(
 
         int sock_fd = -1;
         nurl_tls_t *tls = NULL;
-        NurlStream *stream = NULL;
+        NutStream *stream = NULL;
         nurl_err_t conn_err = NURL_OK;
 
         if (req->pool) {
@@ -154,6 +154,10 @@ int nurl_engine_execute_request(
 
                 // Stage 3: TLS Handshake
                 if (nurl_tls_handshake(tls, sock_fd, host) != 0) {
+                    const char *tls_err = nurl_tls_last_error(tls);
+                    if (tls_err) {
+                        snprintf(req->last_tls_error, sizeof(req->last_tls_error), "%s", tls_err);
+                    }
                     nurl_tls_free(tls);
                     nurl_net_close(sock_fd);
                     free(scheme); free(host); free(path); free(current_url);
@@ -176,7 +180,7 @@ int nurl_engine_execute_request(
             nurl_stream_set_limit_rate(stream, req->limit_rate);
         }
 
-        NurlHeaderMap *temp_hdrs = nurl_headermap_new();
+        NutHeaderMap *temp_hdrs = nurl_headermap_new();
         if (!temp_hdrs) {
             if (req->pool) {
                 nurl_pool_evict(req->pool, stream);
@@ -202,7 +206,7 @@ int nurl_engine_execute_request(
         }
 
         // Dynamic Cookie compilation
-        NurlBuf cookie_buf;
+        NutBuf cookie_buf;
         nurl_buf_init(&cookie_buf);
 
         if (req->cookie && req->cookie[0] != '@') {
@@ -280,7 +284,7 @@ int nurl_engine_execute_request(
             fprintf(stderr, "> \n");
         }
 
-        NurlHttpParams http_params = {0};
+        NutHttpParams http_params = {0};
         http_params.method = req->method;
         http_params.path = path;
         http_params.hostname = host;
@@ -336,7 +340,7 @@ int nurl_engine_execute_request(
                     res->body = decompressed;
                     res->body_len = decompressed_len;
                 } else {
-                    fprintf(stderr, "nurl: Failed to decompress response payload.\n");
+                    nurl_diag_err("Failed to decompress response payload.");
                     nurl_http_response_free(res);
                     free(scheme); free(host); free(path); free(current_url);
                     return_code = NURL_ERR_GENERIC;

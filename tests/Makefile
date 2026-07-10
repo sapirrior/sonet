@@ -14,7 +14,7 @@ test_headers: test_headers.c ../src/engine/utils/nurl_headers.c ../src/engine/ut
 test: all
 	./test_url_parser
 	./test_headers
-	./integration.sh
+	bash ./integration.sh
 
 clean:
 	rm -f $(TESTS)

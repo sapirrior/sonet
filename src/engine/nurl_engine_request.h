@@ -8,20 +8,20 @@
 #include <stddef.h>
 #include <stdio.h>
 
-typedef struct NurlConnPool NurlConnPool;
+typedef struct NutConnPool NutConnPool;
 
-typedef struct NurlRequest NurlRequest;
-typedef void (*nurl_req_headers_cb)(NurlRequest *req, const nurl_http_response_t *res, void *user_data);
+typedef struct NutRequest NutRequest;
+typedef void (*nurl_req_headers_cb)(NutRequest *req, const nurl_http_response_t *res, void *user_data);
 
-struct NurlRequest {
+struct NutRequest {
     const char      *method;       /* "GET", "POST", etc. */
     const char      *url;
-    NurlHeaderMap  *headers;
+    NutHeaderMap  *headers;
     const uint8_t   *body;
     size_t           body_len;
     bool             body_is_stream; /* read from stdin lazily */
 
-    NurlBodyPart    *body_parts;
+    NutBodyPart    *body_parts;
     size_t           body_parts_count;
 
     /* Transfer config */
@@ -71,17 +71,18 @@ struct NurlRequest {
     nurl_req_headers_cb header_cb;
     void            *header_data;
 
-    NurlConnPool *pool;
-    struct NurlStream *stream;
+    NutConnPool *pool;
+    struct NutStream *stream;
+    char             last_tls_error[256];
 };
 
-NurlRequest *nurl_request_new(void);
-void         nurl_request_from_args(NurlRequest *req, const char *method,
+NutRequest *nurl_request_new(void);
+void         nurl_request_from_args(NutRequest *req, const char *method,
                                     const char *url, const CommonArgs *a);
-void         nurl_request_free(NurlRequest *req);
+void         nurl_request_free(NutRequest *req);
 
 /* Internal request building helpers */
-nurl_err_t nurl_headermap_apply_auth(NurlHeaderMap *m, const CommonArgs *a);
-nurl_err_t nurl_headermap_apply_common(NurlHeaderMap *m, const CommonArgs *a);
+nurl_err_t nurl_headermap_apply_auth(NutHeaderMap *m, const CommonArgs *a);
+nurl_err_t nurl_headermap_apply_common(NutHeaderMap *m, const CommonArgs *a);
 
 #endif /* NURL_ENGINE_REQUEST_H */

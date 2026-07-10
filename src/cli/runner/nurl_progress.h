@@ -9,7 +9,7 @@ typedef struct {
     double start_time;
     double last_update;
     bool silent;
-} NurlProgressCtx;
+} NutProgressCtx;
 
 /**
  * The actual callback implementation that draws to the terminal.

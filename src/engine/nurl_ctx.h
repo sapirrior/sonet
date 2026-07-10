@@ -4,10 +4,10 @@
 #include "nurl_pool.h"
 
 typedef struct {
-    NurlConnPool *pool;
-} NurlCtx;
+    NutConnPool *pool;
+} NutCtx;
 
-NurlCtx *nurl_ctx_create(void);
-void     nurl_ctx_destroy(NurlCtx *ctx);
+NutCtx *nurl_ctx_create(void);
+void     nurl_ctx_destroy(NutCtx *ctx);
 
 #endif /* NURL_CTX_H */

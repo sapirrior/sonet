@@ -13,15 +13,15 @@ typedef struct {
     bool is_file;
 } MultipartPart;
 
-struct NurlMultipart {
+struct NutMultipart {
     char boundary[64];
     MultipartPart *parts;
     size_t count;
     char *cached_content_type;
 };
 
-NurlMultipart *nurl_multipart_new(void) {
-    NurlMultipart *m = calloc(1, sizeof(NurlMultipart));
+NutMultipart *nurl_multipart_new(void) {
+    NutMultipart *m = calloc(1, sizeof(NutMultipart));
     if (!m) return NULL;
 
     /* Generate a boundary with enough entropy: combine time, pid, and random */
@@ -46,7 +46,7 @@ NurlMultipart *nurl_multipart_new(void) {
     return m;
 }
 
-void nurl_multipart_add_file(NurlMultipart *m, const char *field_name, const char *filepath, const char *mime_type) {
+void nurl_multipart_add_file(NutMultipart *m, const char *field_name, const char *filepath, const char *mime_type) {
     MultipartPart *temp = realloc(m->parts, sizeof(MultipartPart) * (m->count + 1));
     if (!temp) return; /* OOM: skip this part silently */
     m->parts = temp;
@@ -64,7 +64,7 @@ void nurl_multipart_add_file(NurlMultipart *m, const char *field_name, const cha
     m->count++;
 }
 
-void nurl_multipart_add_field(NurlMultipart *m, const char *name, const char *value) {
+void nurl_multipart_add_field(NutMultipart *m, const char *name, const char *value) {
     MultipartPart *temp = realloc(m->parts, sizeof(MultipartPart) * (m->count + 1));
     if (!temp) return; /* OOM: skip this part silently */
     m->parts = temp;
@@ -81,15 +81,15 @@ void nurl_multipart_add_field(NurlMultipart *m, const char *name, const char *va
     m->count++;
 }
 
-const char *nurl_multipart_content_type(const NurlMultipart *m) {
-    if (((NurlMultipart *)m)->cached_content_type) free(((NurlMultipart *)m)->cached_content_type);
+const char *nurl_multipart_content_type(const NutMultipart *m) {
+    if (((NutMultipart *)m)->cached_content_type) free(((NutMultipart *)m)->cached_content_type);
     char buf[128];
     snprintf(buf, sizeof(buf), "multipart/form-data; boundary=%s", m->boundary);
-    ((NurlMultipart *)m)->cached_content_type = strdup(buf);
+    ((NutMultipart *)m)->cached_content_type = strdup(buf);
     return m->cached_content_type;
 }
 
-void nurl_multipart_into_request(NurlMultipart *m, NurlRequest *req) {
+void nurl_multipart_into_request(NutMultipart *m, NutRequest *req) {
     if (!m || !req) return;
 
     /*
@@ -97,7 +97,7 @@ void nurl_multipart_into_request(NurlMultipart *m, NurlRequest *req) {
      * (header MEM, body MEM/FILE, trailing CRLF MEM) plus 1 final boundary.
      */
     size_t max_parts = 3 * m->count + 1;
-    req->body_parts = calloc(max_parts, sizeof(NurlBodyPart));
+    req->body_parts = calloc(max_parts, sizeof(NutBodyPart));
     if (!req->body_parts) return;
     req->body_parts_count = 0;
 
@@ -174,7 +174,7 @@ oom_cleanup:
     req->body_parts_count = 0;
 }
 
-void nurl_multipart_free(NurlMultipart *m) {
+void nurl_multipart_free(NutMultipart *m) {
     if (!m) return;
     for (size_t i = 0; i < m->count; i++) {
         free(m->parts[i].name);

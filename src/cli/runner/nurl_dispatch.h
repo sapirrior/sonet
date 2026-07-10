@@ -4,6 +4,6 @@
 #include "nurl.h"
 #include "engine/nurl_ctx.h"
 
-int nurl_dispatch(NurlCtx *ctx, const char *method, const char *url, const CommonArgs *args);
+int nurl_dispatch(NutCtx *ctx, const char *method, const char *url, const CommonArgs *args);
 
 #endif /* NURL_DISPATCH_H */

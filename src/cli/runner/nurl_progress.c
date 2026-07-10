@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 void nurl_progress_update(unsigned long downloaded, unsigned long total, bool finished, void *user_data) {
-    NurlProgressCtx *ctx = (NurlProgressCtx *)user_data;
+    NutProgressCtx *ctx = (NutProgressCtx *)user_data;
     if (!ctx || ctx->silent) return;
 
     double now = nurl_utils_get_time_sec();

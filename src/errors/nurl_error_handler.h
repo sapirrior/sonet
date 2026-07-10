@@ -7,6 +7,6 @@
 /**
  * Centrally handles request errors by emitting smart, context-aware diagnostics.
  */
-void nurl_handle_request_error(nurl_err_t err, const NurlRequest *req, const char *target_url);
+void nurl_handle_request_error(nurl_err_t err, const NutRequest *req, const char *target_url);
 
 #endif /* NURL_ERROR_HANDLER_H */

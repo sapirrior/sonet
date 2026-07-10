@@ -1,6 +1,6 @@
-# NetworkURL (nurl)
+# Nurl
 
-NetworkURL (`nurl`) is a clean, fast, portable, and structured HTTP client CLI written in C. 
+Nurl is a clean, fast, portable, and structured HTTP client CLI written in C. 
 
 Unlike traditional command-line HTTP clients that clutter the terminal with complex layouts, `nurl` is built with a simple design philosophy: **plain text, structured details, and smart diagnostics by default.**
 
@@ -14,6 +14,7 @@ The codebase is organized into nested modules dividing user-interface logic from
 src/
 ├── main.c                  # Program entry point (WSA startup/cleanup)
 ├── cli/                    # CLI Interface Layer
+├── cli/                    # CLI Interface Layer
 │   ├── parser/             # Optimized argument parsing (nurl_cli.c)
 │   └── runner/             # Dispatcher, request execution, & progress reporting
 ├── engine/                 # Protocol & Network Engine Layer
@@ -21,10 +22,10 @@ src/
 │   ├── nurl_engine_request.c # Request builder & HTTP payload initialization
 │   ├── nurl_multipart.c    # Multipart/form-data upload management
 │   ├── nurl_ctx.c          # Engine context & state (Connection Pool)
-│   ├── net/                # Buffered I/O (NurlStream) & Connection Pooling
+│   ├── net/                # Buffered I/O (NutStream) & Connection Pooling
 │   ├── tls/                # OpenSSL contexts & verification setup
 │   ├── http/               # HTTP parser, gzip/deflate, redirects
-│   └── utils/              # Cookies, base64, & NurlBuf builder
+│   └── utils/              # Cookies, base64, & NutBuf builder
 └── errors/                 # Smart Error DX Layer
     ├── nurl_diag.c         # Concise Unix-style diagnostics
     └── nurl_error_handler.c # Context-aware diagnostic logic
@@ -178,7 +179,7 @@ cat image.png | nurl https://api.example.com/upload --upload -
 
 `nurl` is a highly-optimized **HTTP/1.1** client:
 
-*   **Buffered I/O (8KB)**: Unified `NurlStream` abstraction reduces syscall overhead.
+*   **Buffered I/O (8KB)**: Unified `NutStream` abstraction reduces syscall overhead.
 *   **Connection Pooling**: Features a proactive pool with 60s idle-eviction.
 *   **TLS 1.2/1.3**: Fully supported via OpenSSL with automatic ALPN.
 *   **Resumable Transfers**: Native support for byte-range resumes.

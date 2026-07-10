@@ -9,14 +9,14 @@
 typedef struct {
     double connect_time_sec;
     int    num_redirects;
-} NurlOperationStats;
+} NutOperationStats;
 
 int nurl_engine_execute_request(
-    NurlCtx *ctx,
-    NurlRequest *req,
+    NutCtx *ctx,
+    NutRequest *req,
     nurl_http_response_t **out_response,
     char **out_effective_url,
-    NurlOperationStats *out_stats
+    NutOperationStats *out_stats
 );
 
 #endif /* NURL_ENGINE_H */

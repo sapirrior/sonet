@@ -4,7 +4,7 @@
 #include <string.h>
 
 void test_header_serialization(void) {
-    NurlHeaderMap *m = nurl_headermap_new();
+    NutHeaderMap *m = nurl_headermap_new();
     ASSERT_NOT_NULL(m);
     
     nurl_headermap_set(m, "Content-Type", "application/json");

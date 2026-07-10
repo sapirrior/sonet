@@ -16,23 +16,23 @@
 #define socket_write(fd, buf, len) write(fd, buf, len)
 #endif
 
-NurlStream *nurl_stream_new(int fd, nurl_tls_t *tls) {
-    NurlStream *s = calloc(1, sizeof(NurlStream));
+NutStream *nurl_stream_new(int fd, nurl_tls_t *tls) {
+    NutStream *s = calloc(1, sizeof(NutStream));
     if (!s) return NULL;
     s->fd = fd;
     s->tls = tls;
     return s;
 }
 
-void nurl_stream_set_limit_rate(NurlStream *s, unsigned long rate) {
+void nurl_stream_set_limit_rate(NutStream *s, unsigned long rate) {
     if (s) s->limit_rate = rate;
 }
 
-void nurl_stream_free(NurlStream *s) {
+void nurl_stream_free(NutStream *s) {
     free(s);
 }
 
-static void throttle(NurlStream *s, size_t bytes) {
+static void throttle(NutStream *s, size_t bytes) {
     if (!s || s->limit_rate == 0 || bytes == 0) return;
 
     double now = nurl_utils_get_time_sec();
@@ -58,7 +58,7 @@ static void throttle(NurlStream *s, size_t bytes) {
     }
 }
 
-static int fill_buffer(NurlStream *s) {
+static int fill_buffer(NutStream *s) {
     if (s->read_buf.pos < s->read_buf.len) {
         return (int)(s->read_buf.len - s->read_buf.pos);
     }
@@ -97,7 +97,7 @@ static int fill_buffer(NurlStream *s) {
     return n;
 }
 
-int nurl_stream_read(NurlStream *s, void *buf, size_t len) {
+int nurl_stream_read(NutStream *s, void *buf, size_t len) {
     if (len == 0) return 0;
 
     // If buffer is empty, try to fill it
@@ -114,7 +114,7 @@ int nurl_stream_read(NurlStream *s, void *buf, size_t len) {
     return (int)to_copy;
 }
 
-int nurl_stream_read_exact(NurlStream *s, void *buf, size_t len) {
+int nurl_stream_read_exact(NutStream *s, void *buf, size_t len) {
     size_t total_read = 0;
     unsigned char *p = (unsigned char *)buf;
 
@@ -126,7 +126,7 @@ int nurl_stream_read_exact(NurlStream *s, void *buf, size_t len) {
     return (int)total_read;
 }
 
-int nurl_stream_read_line(NurlStream *s, char *buf, size_t max_len) {
+int nurl_stream_read_line(NutStream *s, char *buf, size_t max_len) {
     if (max_len <= 1) return 0;
 
     size_t total_read = 0;
@@ -147,7 +147,7 @@ int nurl_stream_read_line(NurlStream *s, char *buf, size_t max_len) {
     return (int)total_read;
 }
 
-int nurl_stream_write(NurlStream *s, const void *buf, size_t len) {
+int nurl_stream_write(NutStream *s, const void *buf, size_t len) {
     size_t to_write = len;
     if (s->limit_rate > 0) {
         size_t remaining_this_sec = s->limit_rate > s->bytes_this_sec ? s->limit_rate - s->bytes_this_sec : 1;
@@ -175,6 +175,6 @@ int nurl_stream_write(NurlStream *s, const void *buf, size_t len) {
     return n;
 }
 
-bool nurl_stream_has_buffered(const NurlStream *s) {
+bool nurl_stream_has_buffered(const NutStream *s) {
     return s->read_buf.pos < s->read_buf.len;
 }

@@ -21,8 +21,8 @@ static void canonicalize_header_key(char *key) {
     }
 }
 
-NurlHeaderMap *nurl_headermap_new(void) {
-    NurlHeaderMap *m = malloc(sizeof(NurlHeaderMap));
+NutHeaderMap *nurl_headermap_new(void) {
+    NutHeaderMap *m = malloc(sizeof(NutHeaderMap));
     if (!m) return NULL;
     m->keys = NULL;
     m->values = NULL;
@@ -31,7 +31,7 @@ NurlHeaderMap *nurl_headermap_new(void) {
     return m;
 }
 
-static nurl_err_t headermap_grow(NurlHeaderMap *m) {
+static nurl_err_t headermap_grow(NutHeaderMap *m) {
     if (m->count >= m->capacity) {
         size_t new_cap = m->capacity == 0 ? 8 : m->capacity * 2;
         char **new_keys = realloc(m->keys, new_cap * sizeof(char *));
@@ -55,7 +55,7 @@ static nurl_err_t headermap_grow(NurlHeaderMap *m) {
     return NURL_OK;
 }
 
-nurl_err_t nurl_headermap_set(NurlHeaderMap *m, const char *key, const char *value) {
+nurl_err_t nurl_headermap_set(NutHeaderMap *m, const char *key, const char *value) {
     if (!m || !key || !value) return NURL_ERR_GENERIC;
 
     char *canon_key = strdup(key);
@@ -90,7 +90,7 @@ nurl_err_t nurl_headermap_set(NurlHeaderMap *m, const char *key, const char *val
     return NURL_OK;
 }
 
-nurl_err_t nurl_headermap_append(NurlHeaderMap *m, const char *key, const char *value) {
+nurl_err_t nurl_headermap_append(NutHeaderMap *m, const char *key, const char *value) {
     if (!m || !key || !value) return NURL_ERR_GENERIC;
 
     char *canon_key = strdup(key);
@@ -114,7 +114,7 @@ nurl_err_t nurl_headermap_append(NurlHeaderMap *m, const char *key, const char *
     return NURL_OK;
 }
 
-bool nurl_headermap_has(const NurlHeaderMap *m, const char *key) {
+bool nurl_headermap_has(const NutHeaderMap *m, const char *key) {
     if (!m || !key) return false;
     for (size_t i = 0; i < m->count; i++) {
         if (nurl_strcasecmp(m->keys[i], key) == 0) {
@@ -124,9 +124,9 @@ bool nurl_headermap_has(const NurlHeaderMap *m, const char *key) {
     return false;
 }
 
-char *nurl_headermap_serialize(const NurlHeaderMap *m) {
+char *nurl_headermap_serialize(const NutHeaderMap *m) {
     if (!m) return NULL;
-    NurlBuf b;
+    NutBuf b;
     nurl_buf_init(&b);
     for (size_t i = 0; i < m->count; i++) {
         nurl_buf_printf(&b, "%s: %s\r\n", m->keys[i], m->values[i]);
@@ -134,7 +134,7 @@ char *nurl_headermap_serialize(const NurlHeaderMap *m) {
     return nurl_buf_take(&b);
 }
 
-void nurl_headermap_free(NurlHeaderMap *m) {
+void nurl_headermap_free(NutHeaderMap *m) {
     if (!m) return;
     if (m->keys) {
         for (size_t i = 0; i < m->count; i++) {
@@ -147,7 +147,7 @@ void nurl_headermap_free(NurlHeaderMap *m) {
     free(m);
 }
 
-nurl_err_t nurl_headermap_add_raw(NurlHeaderMap *m, const char *line) {
+nurl_err_t nurl_headermap_add_raw(NutHeaderMap *m, const char *line) {
     if (!m || !line) return NURL_ERR_GENERIC;
     const char *colon = strchr(line, ':');
     if (!colon) return NURL_ERR_GENERIC;

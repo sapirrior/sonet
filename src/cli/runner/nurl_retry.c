@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int execute_with_retry(NurlCtx *ctx, NurlRequest *req, const CommonArgs *common, nurl_http_response_t **out_res, char **out_effective_url, NurlOperationStats *stats) {
+int execute_with_retry(NutCtx *ctx, NutRequest *req, const CommonArgs *common, nurl_http_response_t **out_res, char **out_effective_url, NutOperationStats *stats) {
     unsigned int max_retries = common->retry;
     unsigned long delay_sec = common->retry_delay > 0 ? common->retry_delay : 1;
     int engine_err = NURL_OK;

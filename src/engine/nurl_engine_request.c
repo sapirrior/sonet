@@ -7,14 +7,14 @@
 #include <stdio.h>
 #include <ctype.h>
 
-NurlRequest *nurl_request_new(void) {
-    NurlRequest *req = calloc(1, sizeof(NurlRequest));
+NutRequest *nurl_request_new(void) {
+    NutRequest *req = calloc(1, sizeof(NutRequest));
     if (!req) return NULL;
     req->max_redirects = 10;
     return req;
 }
 
-nurl_err_t nurl_headermap_apply_auth(NurlHeaderMap *m, const CommonArgs *a) {
+nurl_err_t nurl_headermap_apply_auth(NutHeaderMap *m, const CommonArgs *a) {
     if (!m || !a) return NURL_ERR_GENERIC;
     if (a->no_auth) return NURL_OK;
 
@@ -24,7 +24,7 @@ nurl_err_t nurl_headermap_apply_auth(NurlHeaderMap *m, const CommonArgs *a) {
 
     if (a->bearer || a->token) {
         const char *tok = a->bearer ? a->bearer : a->token;
-        NurlBuf auth_val;
+        NutBuf auth_val;
         nurl_buf_init(&auth_val);
         if (!nurl_buf_printf(&auth_val, "Bearer %s", tok)) {
             nurl_buf_free(&auth_val);
@@ -37,7 +37,7 @@ nurl_err_t nurl_headermap_apply_auth(NurlHeaderMap *m, const CommonArgs *a) {
         char *b64 = nurl_utils_base64_encode((const unsigned char *)a->user, strlen(a->user));
         if (!b64) return NURL_ERR_OOM;
         
-        NurlBuf auth_val;
+        NutBuf auth_val;
         nurl_buf_init(&auth_val);
         if (!nurl_buf_printf(&auth_val, "Basic %s", b64)) {
             free(b64);
@@ -53,7 +53,7 @@ nurl_err_t nurl_headermap_apply_auth(NurlHeaderMap *m, const CommonArgs *a) {
     return NURL_OK;
 }
 
-nurl_err_t nurl_headermap_apply_common(NurlHeaderMap *m, const CommonArgs *a) {
+nurl_err_t nurl_headermap_apply_common(NutHeaderMap *m, const CommonArgs *a) {
     if (!m || !a) return NURL_ERR_GENERIC;
 
     if (a->user_agent && !nurl_headermap_has(m, "User-Agent")) {
@@ -72,7 +72,7 @@ nurl_err_t nurl_headermap_apply_common(NurlHeaderMap *m, const CommonArgs *a) {
     return NURL_OK;
 }
 
-void nurl_request_from_args(NurlRequest *req, const char *method, const char *url, const CommonArgs *a) {
+void nurl_request_from_args(NutRequest *req, const char *method, const char *url, const CommonArgs *a) {
     if (!req || !a) return;
 
     req->method = method;
@@ -86,7 +86,7 @@ void nurl_request_from_args(NurlRequest *req, const char *method, const char *ur
         }
 
         if (a->upload_file || a->upload_fields_count > 0) {
-            NurlMultipart *m = nurl_multipart_new();
+            NutMultipart *m = nurl_multipart_new();
             if (m) {
                 if (a->upload_file) {
                     nurl_multipart_add_file(m, a->upload_name ? a->upload_name : "file", a->upload_file, a->upload_mime);
@@ -162,7 +162,7 @@ void nurl_request_from_args(NurlRequest *req, const char *method, const char *ur
     req->progress = a->progress;
 }
 
-void nurl_request_free(NurlRequest *req) {
+void nurl_request_free(NutRequest *req) {
     if (!req) return;
     if (req->headers) {
         nurl_headermap_free(req->headers);

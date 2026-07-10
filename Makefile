@@ -53,6 +53,6 @@ asan: LDFLAGS = -fsanitize=address,undefined -lssl -lcrypto -lpthread -ldl -lz
 asan: clean $(TARGET)
 
 memcheck: $(TARGET)
-	valgrind --leak-check=full --error-exitcode=1 ./nurl https://jsonplaceholder.typicode.com/posts/1 -s > /dev/null
+	valgrind --leak-check=full --error-exitcode=1 ./$(TARGET) https://jsonplaceholder.typicode.com/posts/1 -s > /dev/null
 
 .PHONY: all clean debug asan memcheck install uninstall test
