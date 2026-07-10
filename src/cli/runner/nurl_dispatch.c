@@ -10,6 +10,7 @@
 #include "errors/nurl_diag.h"
 #include "errors/nurl_error_handler.h"
 #include "compat/nurl_compat.h"
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
