@@ -149,7 +149,7 @@ int nps_request_generic(NpsCtx *ctx, const char *method, const char *url, const 
         req->progress_data = &p_ctx;
     }
 
-    int engine_err = execute_with_retry(ctx, req, common, &res, &effective_url, &stats);
+    int engine_err = execute_with_retry(ctx, req, &res, &effective_url, &stats);
 
     if (engine_err != NPS_OK) {
         if (!common->silent) {
