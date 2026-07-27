@@ -1,5 +1,5 @@
-#ifndef NURL_TEST_RUNNER_H
-#define NURL_TEST_RUNNER_H
+#ifndef NPS_TEST_RUNNER_H
+#define NPS_TEST_RUNNER_H
 
 #include <stdio.h>
 #include <string.h>
@@ -66,4 +66,4 @@ extern int tests_failed;
         return tests_failed > 0 ? 1 : 0; \
     }
 
-#endif /* NURL_TEST_RUNNER_H */
+#endif /* NPS_TEST_RUNNER_H */

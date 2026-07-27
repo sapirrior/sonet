@@ -1,5 +1,5 @@
-nurl
-nurl.exe
+nps
+nps.exe
 *.o
 build/
 *.d

@@ -5,10 +5,10 @@ TESTS = test_url_parser test_headers
 
 all: $(TESTS)
 
-test_url_parser: test_url_parser.c ../src/engine/utils/nurl_utils.c ../src/engine/utils/nurl_buf.c
+test_url_parser: test_url_parser.c ../src/engine/utils/nps_utils.c ../src/engine/utils/nps_buf.c
 	$(CC) $(CFLAGS) $^ -o $@
 
-test_headers: test_headers.c ../src/engine/utils/nurl_headers.c ../src/engine/utils/nurl_buf.c
+test_headers: test_headers.c ../src/engine/utils/nps_headers.c ../src/engine/utils/nps_buf.c
 	$(CC) $(CFLAGS) $^ -o $@
 
 test: all

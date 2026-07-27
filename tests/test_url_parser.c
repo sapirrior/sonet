@@ -1,5 +1,5 @@
 #include "test_runner.h"
-#include "engine/utils/nurl_utils.h"
+#include "engine/utils/nps_utils.h"
 #include <stdlib.h>
 
 void test_url_parsing(void) {
@@ -7,7 +7,7 @@ void test_url_parsing(void) {
     int port;
 
     // Standard HTTP URL
-    ASSERT_EQ(nurl_utils_parse_url("http://example.com/path", &scheme, &host, &port, &path), 0);
+    ASSERT_EQ(nps_utils_parse_url("http://example.com/path", &scheme, &host, &port, &path), 0);
     ASSERT_STR_EQ(scheme, "http");
     ASSERT_STR_EQ(host, "example.com");
     ASSERT_EQ(port, 80);
@@ -15,7 +15,7 @@ void test_url_parsing(void) {
     free(scheme); free(host); free(path);
 
     // Standard HTTPS URL
-    ASSERT_EQ(nurl_utils_parse_url("https://example.com:443/", &scheme, &host, &port, &path), 0);
+    ASSERT_EQ(nps_utils_parse_url("https://example.com:443/", &scheme, &host, &port, &path), 0);
     ASSERT_STR_EQ(scheme, "https");
     ASSERT_STR_EQ(host, "example.com");
     ASSERT_EQ(port, 443);
@@ -23,7 +23,7 @@ void test_url_parsing(void) {
     free(scheme); free(host); free(path);
 
     // Missing path
-    ASSERT_EQ(nurl_utils_parse_url("http://example.com", &scheme, &host, &port, &path), 0);
+    ASSERT_EQ(nps_utils_parse_url("http://example.com", &scheme, &host, &port, &path), 0);
     ASSERT_STR_EQ(scheme, "http");
     ASSERT_STR_EQ(host, "example.com");
     ASSERT_EQ(port, 80);
